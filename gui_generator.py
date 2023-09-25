@@ -4,9 +4,9 @@ Created on Tue Aug 22 02:32:04 2023
 
 @author: jhsia
 """
+#%% v1.1, creates a PY file that can be run to launch the GUI without backend
 
 # set up the input and output files (transform from UI to PY file)
-
 import os
 
 INPUT = 'C:/Users/jhsia/Documents/GitHub/piv_gui/input.ui'
@@ -22,8 +22,7 @@ else:
 cmd = 'pyuic5 -o ' + OUTPUT + ' ' + INPUT
 os.system(cmd)
 
-#%% add a few lines to make the file able to be run as a PY file
-
+# Adds the needed lines to operate the UI as a PY file
 with open(OUTPUT, 'a+') as file:
     file.write("\n")
     file.write("def main():\n")
@@ -41,30 +40,47 @@ with open(OUTPUT, 'a+') as file:
     file.write("    import sys\n")
     file.write("    m = main()")
     
-#%% 
-
+# Runs the output file
 with open(OUTPUT) as f:
     exec(f.read())
 
-#%% Place this in the new file if above doesn't work
+# Place this in the new file if above doesn't work
+"""
+def main():
+    if not QtWidgets.QApplication.instance():
+        app = QtWidgets.QApplication(sys.argv)
+    else:
+        app = QtWidgets.QApplication.instance()
+    main = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(main)
+    main.show()
+    return main
 
-# def main():
-#     if not QtWidgets.QApplication.instance():
-#         app = QtWidgets.QApplication(sys.argv)
-#     else:
-#         app = QtWidgets.QApplication.instance()
-#     main = QtWidgets.QMainWindow()
-#     ui = Ui_MainWindow()
-#     ui.setupUi(main)
-#     main.show()
-#     return main
+if __name__ == '__main__':
+    import sys
+    m = main()
+"""
 
-# if __name__ == '__main__':
-#     import sys
-#     m = main()
+#%% v1.0, do not use (KERNEL WILL FREEZE ON CLOSE OF GUI)
 
-#%% OLD OPTION, DO NOT USE (KERNEL WILL FREEZE ON CLOSE OF GUI)
+# # set up the input and output files (transform from UI to PY file)
+# import os
 
+# INPUT = 'C:/Users/jhsia/Documents/GitHub/piv_gui/input.ui'
+# OUTPUT = 'C:/Users/jhsia/Documents/GitHub/piv_gui/output.py'
+
+# # If file exists, delete it.
+# if os.path.isfile(OUTPUT):
+#     os.remove(OUTPUT)
+# else:
+#     # If it fails, inform the user.
+#     print("Error: %s file not found" % OUTPUT)
+
+# cmd = 'pyuic5 -o ' + OUTPUT + ' ' + INPUT
+# os.system(cmd)
+
+# # Adds the needed lines to operate the UI as a PY file
 # with open(OUTPUT, 'a+') as file:
 #     file.write("\n")
 #     file.write("if __name__ == \"__main__\":\n")
@@ -76,6 +92,8 @@ with open(OUTPUT) as f:
 #     file.write("    w.show()\n")
 #     file.write("    sys.exit(app.exec_())")
 
+# # Place this in the new file if above doesn't work
+# """
 # if __name__ == "__main__":
 #     import sys
 #     app = QtWidgets.QApplication(sys.argv)
@@ -84,3 +102,4 @@ with open(OUTPUT) as f:
 #     ui.setupUi(w)
 #     w.show()
 #     sys.exit(app.exec_())
+# """
