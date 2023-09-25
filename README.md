@@ -5,6 +5,7 @@ A project to build a simple GUI that provides visualization of simple flows.
 ## Table of Contents
 * [General Information](#general-information)
 * [Usage](#usage)
+* [Developer Installation](#developer-installation)
 * [Project Status](#project-status)
 * [Acknowledgements](#acknowledgements)
 * [Contact](#contact)
@@ -18,6 +19,9 @@ A project to build a simple GUI that provides visualization of simple flows.
 Qt Designer is used to quickly iterate any visible parts of the design. The actual code for the flow visualization is then appended and the code is then integrated.
 
 ## Usage
+
+## Developer Installation
+conda install -c anaconda pyqt
 
 ## Project Status
 
