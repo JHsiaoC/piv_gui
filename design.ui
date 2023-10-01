@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>350</width>
-    <height>500</height>
+    <height>570</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,6 +16,18 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>350</width>
+    <height>570</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>350</width>
+    <height>570</height>
+   </size>
+  </property>
   <property name="cursor">
    <cursorShape>ArrowCursor</cursorShape>
   </property>
@@ -23,12 +35,12 @@
    <string>Flow Visualization</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pushButton_generate">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>400</y>
-      <width>101</width>
+      <y>520</y>
+      <width>151</width>
       <height>21</height>
      </rect>
     </property>
@@ -36,7 +48,7 @@
      <string>Generate Field</string>
     </property>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QGroupBox" name="groupBox_particleGen">
     <property name="enabled">
      <bool>true</bool>
     </property>
@@ -45,7 +57,7 @@
       <x>10</x>
       <y>70</y>
       <width>331</width>
-      <height>181</height>
+      <height>191</height>
      </rect>
     </property>
     <property name="font">
@@ -60,7 +72,7 @@
      <bool>false</bool>
     </property>
     <property name="title">
-     <string>Parameters</string>
+     <string>Particle Generation</string>
     </property>
     <property name="flat">
      <bool>false</bool>
@@ -68,53 +80,72 @@
     <property name="checkable">
      <bool>false</bool>
     </property>
-    <widget class="QWidget" name="formLayoutWidget_2">
+    <widget class="QCheckBox" name="checkBox_randomSeed">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>221</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Randomize particle generation</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QWidget" name="formLayoutWidget_3">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>20</y>
        <width>311</width>
-       <height>152</height>
+       <height>101</height>
       </rect>
      </property>
-     <layout class="QFormLayout" name="formLayout_2">
+     <layout class="QFormLayout" name="formLayout_particleGen">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="label_ppp">
         <property name="text">
-         <string>Particles per pixel</string>
+         <string>Particles per pixel (PPP)                 </string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="label_xdim">
         <property name="text">
          <string>Horizontal window size [px]</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="label_ydim">
         <property name="text">
          <string>Vertical window size [px]</string>
         </property>
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="label_sigma">
         <property name="text">
-         <string>Maximum particle velocity [px/sec]</string>
+         <string>Standard deviation(s)</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_5">
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEdit_ppp">
+        <property name="inputMethodHints">
+         <set>Qt::ImhDigitsOnly</set>
+        </property>
         <property name="text">
-         <string>Sampling interval [sec]</string>
+         <string>0.01</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_2">
+       <widget class="QLineEdit" name="lineEdit_xdim">
         <property name="inputMethodHints">
          <set>Qt::ImhDigitsOnly</set>
         </property>
@@ -124,7 +155,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEdit_3">
+       <widget class="QLineEdit" name="lineEdit_ydim">
         <property name="inputMethodHints">
          <set>Qt::ImhDigitsOnly</set>
         </property>
@@ -134,34 +165,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLineEdit" name="lineEdit_4">
-        <property name="inputMethodHints">
-         <set>Qt::ImhDigitsOnly</set>
-        </property>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="lineEdit_5">
-        <property name="inputMethodHints">
-         <set>Qt::ImhDigitsOnly</set>
-        </property>
-        <property name="text">
-         <string>0.01</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Standard deviation(s)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLineEdit" name="lineEdit_6">
+       <widget class="QLineEdit" name="lineEdit_sigma">
         <property name="inputMethodHints">
          <set>Qt::ImhDigitsOnly</set>
         </property>
@@ -170,20 +174,39 @@
         </property>
        </widget>
       </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="formLayoutWidget_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>311</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <layout class="QFormLayout" name="formLayout_seed">
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLineEdit" name="lineEdit_seed">
         <property name="inputMethodHints">
          <set>Qt::ImhDigitsOnly</set>
         </property>
         <property name="text">
-         <string>0.01</string>
+         <string>0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_seed">
+        <property name="text">
+         <string>Particle generation seed                </string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox">
+   <widget class="QGroupBox" name="groupBox_flowType">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -204,9 +227,9 @@
        <height>22</height>
       </rect>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_flowType">
       <item>
-       <widget class="QComboBox" name="comboBox">
+       <widget class="QComboBox" name="comboBox_flowType">
         <property name="font">
          <font>
           <italic>false</italic>
@@ -247,12 +270,12 @@
      </layout>
     </widget>
    </widget>
-   <widget class="QPushButton" name="pushButton_4">
+   <widget class="QPushButton" name="pushButton_clear">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>430</y>
-      <width>101</width>
+      <x>260</x>
+      <y>520</y>
+      <width>71</width>
       <height>21</height>
      </rect>
     </property>
@@ -260,25 +283,12 @@
      <string>Clear Data</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="pushButton_save">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>430</y>
-      <width>101</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Simulate Flows</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_3">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>400</y>
-      <width>101</width>
+      <x>180</x>
+      <y>520</y>
+      <width>71</width>
       <height>21</height>
      </rect>
     </property>
@@ -286,17 +296,17 @@
      <string>Save Data</string>
     </property>
    </widget>
-   <widget class="QGroupBox" name="groupBox_3">
+   <widget class="QGroupBox" name="groupBox_flowGen">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>260</y>
+      <y>270</y>
       <width>331</width>
-      <height>131</height>
+      <height>211</height>
      </rect>
     </property>
     <property name="title">
-     <string>Flow-dependant Parameters</string>
+     <string>Flow Generation</string>
     </property>
     <property name="checkable">
      <bool>false</bool>
@@ -307,60 +317,96 @@
        <x>10</x>
        <y>20</y>
        <width>311</width>
-       <height>101</height>
+       <height>181</height>
       </rect>
      </property>
-     <layout class="QFormLayout" name="formLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_7">
+     <layout class="QFormLayout" name="formLayout_flowGen">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_Gamma">
         <property name="text">
-         <string>Circulation (m^2/s)</string>
+         <string>Circulation [px^2/s]</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Kinematic viscosity (mm^2/s) </string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_8">
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="lineEdit_Gamma">
         <property name="inputMethodHints">
          <set>Qt::ImhDigitsOnly</set>
         </property>
         <property name="text">
-         <string/>
+         <string>655360</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_9">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_nu">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Kinematic viscosity [px^2/s] </string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="lineEdit_nu">
+        <property name="inputMethodHints">
+         <set>Qt::ImhDigitsOnly</set>
+        </property>
+        <property name="text">
+         <string>655.36</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_omega">
+        <property name="text">
+         <string>Oscillation frequency [cycles/sec]  </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="lineEdit_omega">
+        <property name="inputMethodHints">
+         <set>Qt::ImhDigitsOnly|Qt::ImhLatinOnly</set>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_centerX">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="text">
          <string>Center X (px)</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEdit_9">
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="lineEdit_centerX">
         <property name="inputMethodHints">
-         <set>Qt::ImhDigitsOnly|Qt::ImhLatinOnly</set>
+         <set>Qt::ImhDigitsOnly</set>
         </property>
         <property name="text">
          <string>128</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_10">
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_centerY">
         <property name="text">
          <string>Center Y (px)</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="lineEdit_10">
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="lineEdit_centerY">
         <property name="inputMethodHints">
          <set>Qt::ImhDigitsOnly</set>
         </property>
@@ -369,37 +415,109 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_Vmax">
+        <property name="text">
+         <string>Maximum particle velocity [px/sec]</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="lineEdit_7">
+       <widget class="QLineEdit" name="lineEdit_Vmax">
         <property name="inputMethodHints">
          <set>Qt::ImhDigitsOnly</set>
         </property>
         <property name="text">
-         <string/>
+         <string>4</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_timestep">
+        <property name="text">
+         <string>Sampling interval [sec]</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEdit_timestep">
+        <property name="inputMethodHints">
+         <set>Qt::ImhDigitsOnly</set>
+        </property>
+        <property name="text">
+         <string>0.01</string>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </widget>
-   <widget class="QCheckBox" name="checkBox">
+   <widget class="QWidget" name="horizontalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>400</y>
-      <width>71</width>
-      <height>21</height>
+      <x>20</x>
+      <y>490</y>
+      <width>311</width>
+      <height>20</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Plot Field</string>
-    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="checkBox_visualize">
+       <property name="text">
+        <string>Visualize Field</string>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_OR">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>16</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>OR</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBox_plot">
+       <property name="layoutDirection">
+        <enum>Qt::RightToLeft</enum>
+       </property>
+       <property name="text">
+        <string>Plot Field</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup</string>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
    </widget>
-  </widget>
-  <widget class="QStatusBar" name="statusbar">
-   <property name="sizeGripEnabled">
-    <bool>true</bool>
-   </property>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="enabled">
@@ -441,25 +559,36 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>lineEdit</tabstop>
-  <tabstop>lineEdit_2</tabstop>
-  <tabstop>lineEdit_3</tabstop>
-  <tabstop>lineEdit_4</tabstop>
-  <tabstop>lineEdit_5</tabstop>
-  <tabstop>lineEdit_6</tabstop>
-  <tabstop>lineEdit_7</tabstop>
-  <tabstop>lineEdit_8</tabstop>
-  <tabstop>lineEdit_9</tabstop>
-  <tabstop>lineEdit_10</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>pushButton_3</tabstop>
-  <tabstop>pushButton_4</tabstop>
-  <tabstop>checkBox</tabstop>
+  <tabstop>comboBox_flowType</tabstop>
+  <tabstop>lineEdit_ppp</tabstop>
+  <tabstop>lineEdit_xdim</tabstop>
+  <tabstop>lineEdit_ydim</tabstop>
+  <tabstop>lineEdit_sigma</tabstop>
+  <tabstop>checkBox_randomSeed</tabstop>
+  <tabstop>lineEdit_seed</tabstop>
+  <tabstop>lineEdit_Vmax</tabstop>
+  <tabstop>lineEdit_timestep</tabstop>
+  <tabstop>lineEdit_Gamma</tabstop>
+  <tabstop>lineEdit_nu</tabstop>
+  <tabstop>lineEdit_omega</tabstop>
+  <tabstop>lineEdit_centerX</tabstop>
+  <tabstop>lineEdit_centerY</tabstop>
+  <tabstop>checkBox_visualize</tabstop>
+  <tabstop>checkBox_plot</tabstop>
+  <tabstop>pushButton_generate</tabstop>
+  <tabstop>pushButton_save</tabstop>
+  <tabstop>pushButton_clear</tabstop>
  </tabstops>
  <resources/>
  <connections/>
  <slots>
   <signal>signal1()</signal>
  </slots>
+ <buttongroups>
+  <buttongroup name="buttonGroup">
+   <property name="exclusive">
+    <bool>false</bool>
+   </property>
+  </buttongroup>
+ </buttongroups>
 </ui>
