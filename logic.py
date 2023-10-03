@@ -3,46 +3,21 @@
 Created on Mon Sep 25 15:16:57 2023
 
 @author: jhsia
-"""
-import torch
-from torchdiffeq import odeint
-import matplotlib.pyplot as plt
 
-#%%
-
-def pytgen(ppp, xdim = 256, ydim = 256, random = True, seed = 'foo'):
-    number_pixels = int(xdim*ydim)  #counts number of pixels in the frame
-    particles = int(number_pixels*ppp)  #counts number of particles that should be present
-    if random == True:
-        x0 = xdim*torch.rand((particles,2),dtype=(torch.float32)) # make the "initial" data
-    if random == False:
-        torch.manual_seed(seed)
-        x0 = xdim*torch.rand((particles,2),dtype=(torch.float32)) # make the data with seeded value
-
-    # if plot == True:
-    #     fig, ax = plt.subplots()
-    #     ax.scatter(x0[:,0], x0[:,1], s = 3)
-    #     ax.set_title('Pytorch')
-    return x0
-
-# def npgen(ppp, xdim, ydim, plot = False):
-#     number_pixels = int(xdim*ydim)  #counts number of pixels in the frame
-#     particles = int(number_pixels*ppp)  #counts number of particles that should be present
-#     x0_num = xdim*np.random.rand(particles,2) # make the "initial" data
-#     x0 = torch.from_numpy(x0_num) #conversion from numpy to torch
-#     x0 = x0.type(torch.float32) #conversion from float64 to float32 (not sure why)
-    
-#     if plot == True:
-#         fig, ax = plt.subplots()
-#         ax.scatter(x0[:,0], x0[:,1], s = 3)
-#         ax.set_title('X = '+ str(xdim) + ' Y = '+ str(ydim) + ' ppp = ' + str(ppp))
-#     return x0
-
-#%% Flow Functions
-"""
 Nomenclature:
-    INPUTS:
-    x0 = initial vector of particle positions [pixels]
+    
+particle generation
+
+    INPUT (double)
+        ppp = particles per pixel (px)
+    INPUT (int)
+        xdim = plot size in the horizontal direction [px]
+        ydim = plot size in the vertical direction [px]
+        
+    OUTPUT (tensor of doubles)
+        x0 = initial vector of particle positions [px]
+
+flow functions
     Vmax = Maximum Velocity [pixels/second]
     timestep = time from initial to final positions [second]
     sigma = value for one standard deviation from mean (mean is assumed to be zero) [pixel]
@@ -55,6 +30,23 @@ Nomenclature:
     phi = matrix of velocity coefficient for the position vector SQUARED
         (a.k.a. what number multiplied to position squared result in velocity)
 """
+
+import torch
+from torchdiffeq import odeint
+import matplotlib.pyplot as plt
+
+#%% particle generation
+def pytgen(ppp, xdim = 256, ydim = 256, random = True, seed = 'foo'):
+    number_pixels = int(xdim*ydim)  #counts number of pixels in the frame
+    particles = int(number_pixels*ppp)  #counts number of particles that should be present
+    if random == True:
+        x0 = xdim*torch.rand((particles,2),dtype=(torch.float32)) # make the "initial" data
+    if random == False:
+        torch.manual_seed(seed)
+        x0 = xdim*torch.rand((particles,2),dtype=(torch.float32)) # make the data with seeded value
+    return x0
+
+#%% flow functions
 
 ## Steady 2D flows
 # Uniform flow
@@ -295,7 +287,7 @@ def rayleigh_problem(x0, Vmax, nu, t, sigma = 0, plot = False):
     # if plot == True:
     #     fig, ax = plt.subplots()
     #     ax.quiver(X[:,0], X[:,1], V[:,0], V[:,1])
-    #     ax.set_title('Stokes First Problem @ %f s' %t)
+    #     ax.set_title('Rayleigh Problem @ %f s' %t)
     #     ax.set_aspect('equal', adjustable='box')
     # if sigma > 0:
     #     noise = sigma*torch.randn_like(X,dtype=torch.float64)
@@ -303,7 +295,7 @@ def rayleigh_problem(x0, Vmax, nu, t, sigma = 0, plot = False):
     #     fig, ax = plt.subplots()
     #     ax.quiver(X_noisy[:,0], X_noisy[:,1], V[:,0], V[:,1])
     #     ax.set_aspect('equal', adjustable='box')
-    #     ax.set_title('Stokes First Problem w/ Noise')
+    #     ax.set_title('Rayleigh Problem w/ Noise')
     
     return X
 
@@ -314,7 +306,7 @@ def stokes_problem(x0, Vmax, omega, nu, t, sigma = 0, plot = False):
     def stokes_ODE(t,x0):
         y = x0[:,1].reshape(-1,1)
         exponent = torch.exp(-omega*y/2/nu)
-        trig_func = torch.cos(omega*t-torch.sqrt(omega/2/nu)*y)
+        trig_func = torch.cos(omega*t-torch.sqrt(torch.tensor(omega/2/nu))*y)
         x_vel = Vmax*torch.mul(exponent,trig_func)
         y_vel = torch.zeros_like(x_vel)
         vel = torch.cat((x_vel,y_vel),1)
@@ -324,41 +316,43 @@ def stokes_problem(x0, Vmax, omega, nu, t, sigma = 0, plot = False):
     history = odeint(stokes_ODE,x0,time_S2)
     X = history[-1,:,:]
     
+    if plot == True:
+        fig, ax = plt.subplots()
+        ax.scatter(x0[:, 0], x0[:, 1], s = 3)
+        ax.scatter(X[:,0], X[:,1], s = 3)
+        ax.set_aspect('equal', adjustable='box')
+        ax.set_title('Stokes Problem @ %f s' %t)
+    if sigma > 0:
+        noise = sigma*torch.randn_like(X,dtype=torch.float64)
+        X_noisy = X + noise
+        fig, ax = plt.subplots()
+        ax.scatter(x0[:, 0], x0[:, 1], s = 3)
+        ax.scatter(X_noisy[:,0], X_noisy[:,1], s = 3)
+        ax.set_aspect('equal', adjustable='box')
+        ax.set_title('Stokes Problem w/ Noise')
+        
     # if plot == True:
     #     fig, ax = plt.subplots()
-    #     ax.scatter(x0[:, 0], x0[:, 1], s = 3)
-    #     ax.scatter(X[:,0], X[:,1], s = 3)
+    #     ax.quiver(X[:,0], X[:,1], V[:,0], V[:,1])
     #     ax.set_aspect('equal', adjustable='box')
     #     ax.set_title('Stokes Problem @ %f s' %t)
     # if sigma > 0:
     #     noise = sigma*torch.randn_like(X,dtype=torch.float64)
     #     X_noisy = X + noise
     #     fig, ax = plt.subplots()
-    #     ax.scatter(x0[:, 0], x0[:, 1], s = 3)
-    #     ax.scatter(X_noisy[:,0], X_noisy[:,1], s = 3)
+    #     ax.quiver(X_noisy[:,0], X_noisy[:,1], V[:,0], V[:,1])
     #     ax.set_aspect('equal', adjustable='box')
     #     ax.set_title('Stokes Problem w/ Noise')
-        
-    if plot == True:
-        fig, ax = plt.subplots()
-        ax.quiver(X[:,0], X[:,1], V[:,0], V[:,1])
-        ax.set_aspect('equal', adjustable='box')
-        ax.set_title('Stokes Second Problem @ %f s' %t)
-    if sigma > 0:
-        noise = sigma*torch.randn_like(X,dtype=torch.float64)
-        X_noisy = X + noise
-        fig, ax = plt.subplots()
-        ax.quiver(X_noisy[:,0], X_noisy[:,1], V[:,0], V[:,1])
-        ax.set_aspect('equal', adjustable='box')
-        ax.set_title('Stokes Second Problem w/ Noise')
     
     return X
 
-#%%
+#%% importing a GUI class from design.py to connect signals
 
-from PyQt5 import QtGui, QtWidgets
 # from PyQt5 import QtCore, QtGui, QtWidgets
     # might need all three later on
+from PyQt5 import QtGui, QtWidgets
+
+# importing the QtDesigner-built GUI from design.py (converted from design.ui)
 from design import Ui_MainWindow
 
 class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -371,19 +365,23 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         
         # initialize input validation
         onlyDbl = QtGui.QDoubleValidator()
+        
         onlyInt = QtGui.QIntValidator()
         
-        self.lineEdit_ppp.setValidator(onlyDbl)
+        onlyPosDbl = QtGui.QDoubleValidator()
+        onlyPosDbl.setBottom(0)
+        
+        self.lineEdit_ppp.setValidator(onlyPosDbl)
         self.lineEdit_xdim.setValidator(onlyInt)
         self.lineEdit_ydim.setValidator(onlyInt)
-        self.lineEdit_sigma.setValidator(onlyDbl)
+        self.lineEdit_sigma.setValidator(onlyPosDbl)
         
         self.lineEdit_seed.setValidator(onlyInt)
         
         self.lineEdit_Vmax.setValidator(onlyDbl)
-        self.lineEdit_timestep.setValidator(onlyDbl)
+        self.lineEdit_timestep.setValidator(onlyPosDbl)
         self.lineEdit_Gamma.setValidator(onlyDbl)
-        self.lineEdit_nu.setValidator(onlyDbl)
+        self.lineEdit_nu.setValidator(onlyPosDbl)
         self.lineEdit_omega.setValidator(onlyDbl)
         self.lineEdit_centerX.setValidator(onlyInt)
         self.lineEdit_centerY.setValidator(onlyInt)
@@ -461,7 +459,13 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def generate_field(self):
         
-        # Update values
+        # make values global for saving
+        global ppp, xdim, ydim, sigma
+        global Vmax, timestep, Gamma, nu, omega, centerX, centerY, t
+        global random, seed, plot, visualize
+        global x0, X, V
+        
+        # update values
         ppp = float(self.lineEdit_ppp.text())
         xdim = float(self.lineEdit_xdim.text())
         ydim = float(self.lineEdit_ydim.text())
@@ -482,7 +486,7 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         
         plot = self.checkBox_plot.isChecked()
         visualize = self.checkBox_visualize.isChecked()       
-
+        
         x0 = pytgen(ppp, xdim, ydim, random, seed)
         
         # Generate flows        
@@ -512,6 +516,7 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
             
     def save_data(self):
         print("Data Saved")
+        print(x0)
         
     def clear_data(self):
         print("Data Cleared")
