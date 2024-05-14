@@ -34,6 +34,7 @@ flow functions
 import torch
 from torchdiffeq import odeint
 import matplotlib.pyplot as plt
+import sys
 
 #%% particle generation
 def pytgen(ppp, xdim = 256, ydim = 256, random = True, seed = 'foo'):
@@ -389,8 +390,9 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         # initialize booleans
         self.flow_selection()
         self.random_seed()
-        self.plot_field()
-        
+        self.visualize_check()
+        self.plot_check()
+
         ## signals to trigger slots
         # connect comboBox for flow type
         self.comboBox_flowType.currentIndexChanged.connect(self.flow_selection)
@@ -403,11 +405,10 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         self.pushButton_save.clicked.connect(self.save_data)
         self.pushButton_clear.clicked.connect(self.clear_data)
         
-        # connect checkBoxes
-        self.checkBox_visualize.stateChanged.connect(self.visualize_field)
-        self.checkBox_plot.stateChanged.connect(self.plot_field)
+        # # connect checkBoxes
+        self.checkBox_visualize.stateChanged.connect(self.visualize_check)
+        self.checkBox_plot.stateChanged.connect(self.plot_check)
 
-            
     ## slots that trigger from signals
     # update flow type
     def flow_selection(self):
@@ -493,6 +494,8 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.comboBox_flowType.currentIndex() == 0:
             print("Uniform")
             X,V = uniform_flow(x0, Vmax, timestep, sigma, plot)
+            if plot | visualize == True:
+                self.create_graphics_window()
         
         if self.comboBox_flowType.currentIndex() == 1:
             print("Couette")
@@ -505,7 +508,9 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.comboBox_flowType.currentIndex() == 3:
             print("Lamb-Oseen")
             X = lamb_oseen_vortex(x0, Gamma, nu, t, centerX, centerY, sigma, plot, visualize)
-            
+            if plot | visualize == True:
+                self.create_graphics_window()
+
         if self.comboBox_flowType.currentIndex() == 4:
             print("Rayleigh Problem")
             X = rayleigh_problem(x0, Vmax, nu, t, sigma, plot)
@@ -513,7 +518,12 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.comboBox_flowType.currentIndex() == 5:
             print("Stokes Problem")
             X = stokes_problem(x0, Vmax, omega, nu, t, sigma, plot)
-            
+
+    def create_graphics_window(self):
+        # This function creates and shows the graphics window
+        self.plot_window = GraphicsWindow()
+        self.plot_window.show()
+
     def save_data(self):
         print("Data Saved")
         print(x0)
@@ -530,7 +540,7 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
             print('Random generation disabled')
             self.lineEdit_seed.setDisabled(False)
     
-    def visualize_field(self):
+    def visualize_check(self):
         visualize = self.checkBox_visualize.isChecked()
         
         if visualize and self.checkBox_plot.isChecked() == True:
@@ -541,7 +551,7 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         elif visualize == False:
             print('Visualization disabled')
     
-    def plot_field(self):
+    def plot_check(self):
         plot = self.checkBox_plot.isChecked()
         
         if plot and self.checkBox_visualize.isChecked() == True:
@@ -551,15 +561,60 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
             print('Plotting enabled')
         elif plot == False:
             print('Plotting disabled')
-def main():
+
+# create plotting window class
+from PyQt5.QtWidgets import QMainWindow, QApplication, QVBoxLayout, QWidget, QPushButton
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+
+class GraphicsWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Flow Visualization')
+        self.setGeometry(300, 300, 600, 500)
+        self.create_plot()
+
+    def create_plot(self):
+        # Create the matplotlib figure and canvas
+        self.figure = Figure()
+        self.canvas = FigureCanvas(self.figure)
+        
+        # Create the layout and add the canvas and toolbar
+        layout = QVBoxLayout()
+        toolbar = NavigationToolbar(self.canvas, self)
+        layout.addWidget(self.canvas)
+        layout.addWidget(toolbar)
+
+        # Set the layout to a central widget
+        central_widget = QWidget()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
+
+    #     # Plot data
+    #     self.plot_data()
+
+    # def plot_data(self):
+    #     ax = self.figure.add_subplot(111)
+    #     t = np.arange(0.0, 2.0, 0.01)
+    #     s = 1 + np.sin(2 * np.pi * t)
+    #     ax.plot(t, s)
+    #     ax.set_title('Sine Wave')
+    #     ax.set_xlabel('Time (s)')
+    #     ax.set_ylabel('Amplitude')
+    #     ax.grid(True)
+    #     self.canvas.draw()
+
+def start():
     if not QtWidgets.QApplication.instance():
-        _ = QtWidgets.QApplication(sys.argv)
+        app = QtWidgets.QApplication(sys.argv)
     else:
-        _ = QtWidgets.QApplication.instance()
-    main = Logic()
-    main.show()
-    return main
+        app = QtWidgets.QApplication.instance()
+    
+    main_window = Logic()
+    main_window.show()
+    return app.exec_()  # This will start the event loop
 
 if __name__ == '__main__':
-    import sys
-    m = main()
+    exit_status = start()
+    sys.exit(exit_status)
