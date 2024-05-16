@@ -593,7 +593,7 @@ class GraphicsWindow(QMainWindow):
 
     #     # Plot data
     #     self.plot_data()
-
+    
     # def plot_data(self):
     #     ax = self.figure.add_subplot(111)
     #     t = np.arange(0.0, 2.0, 0.01)
