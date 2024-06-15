@@ -90,7 +90,7 @@ def uniform_flow(x0, Vmax, timestep, sigma = 0, plot = False):
         ax.set_aspect('equal', adjustable='box')
         ax.set_title('Uniform Flow w/ Noise')
         
-    return X,V
+    return X, V, fig, ax
 
 # General Couette flow
 def couette_flow(x0, Vmax, timestep, ydim, sigma = 0, plot = False):
@@ -135,7 +135,7 @@ def couette_flow(x0, Vmax, timestep, ydim, sigma = 0, plot = False):
         ax.quiver(X_noisy[:,0], X_noisy[:,1], V[:,0], V[:,1])
         ax.set_aspect('equal', adjustable='box')
         ax.set_title('Couette Flow w/ Noise')
-    return X,V,theta
+    return X, V, theta, fig, ax
 
 # Plane Poiseuille flow
 def poiseuille_flow(x0, Vmax, timestep, ydim, sigma = 0, plot = False):
@@ -182,7 +182,7 @@ def poiseuille_flow(x0, Vmax, timestep, ydim, sigma = 0, plot = False):
         ax.quiver(X_noisy[:,0], X_noisy[:,1], V[:,0], V[:,1])
         ax.set_aspect('equal', adjustable='box')
         ax.set_title('Poiseuille Flow w/ Noise')
-    return X,V,theta,phi
+    return X, V, theta, phi, fig, ax
 
 ## "Steady" Unsteady 2D flows
 # Lamb–Oseen Vortex at fixed time, assumes CCW circulation as positive
@@ -254,7 +254,7 @@ def lamb_oseen_vortex(x0, Gamma, nu, t, centerX = 256/2, centerY = 256/2, sigma 
             ax.set_aspect('equal', adjustable='box')
             ax.set_title('Lamb–Oseen Flow w/ Noise')
     
-    return X
+    return X, fig, ax
 
 # Rayleigh problem (or Stokes First Problem)
 def rayleigh_problem(x0, Vmax, nu, t, sigma = 0, plot = False):
@@ -298,7 +298,7 @@ def rayleigh_problem(x0, Vmax, nu, t, sigma = 0, plot = False):
     #     ax.set_aspect('equal', adjustable='box')
     #     ax.set_title('Rayleigh Problem w/ Noise')
     
-    return X
+    return X, fig, ax
 
 # Stokes problem (or Stokes Second Problem)
     # moving plate's surface at y = 0
@@ -345,7 +345,7 @@ def stokes_problem(x0, Vmax, omega, nu, t, sigma = 0, plot = False):
     #     ax.set_aspect('equal', adjustable='box')
     #     ax.set_title('Stokes Problem w/ Noise')
     
-    return X
+    return X, fig, ax
 
 #%% importing a GUI class from design.py to connect signals
 
@@ -493,40 +493,71 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         # Generate flows        
         if self.comboBox_flowType.currentIndex() == 0:
             print("Uniform")
-            X,V = uniform_flow(x0, Vmax, timestep, sigma, plot)
             if plot | visualize == True:
+                X, V, fig, ax = uniform_flow(x0, Vmax, timestep, sigma, plot)
                 self.create_graphics_window()
+                self.plot_window.create_plot(fig, ax)
         
         if self.comboBox_flowType.currentIndex() == 1:
             print("Couette")
-            X,V,_ = couette_flow(x0, Vmax, timestep, ydim, sigma, plot)
-            
+            if plot | visualize == True:
+                X, V, _, fig, ax = couette_flow(x0, Vmax, timestep, ydim, sigma, plot)
+                self.create_graphics_window()
+                self.plot_window.create_plot(fig, ax)
+
         if self.comboBox_flowType.currentIndex() == 2:
             print("Poiseuille")
-            X,V,_,_ = poiseuille_flow(x0, Vmax, timestep, ydim, sigma, plot)
-    
+            if plot | visualize == True:
+                X, V, _, _, fig, ax = poiseuille_flow(x0, Vmax, timestep, ydim, sigma, plot)
+                self.create_graphics_window()
+                self.plot_window.create_plot(fig, ax)
+
         if self.comboBox_flowType.currentIndex() == 3:
             print("Lamb-Oseen")
-            X = lamb_oseen_vortex(x0, Gamma, nu, t, centerX, centerY, sigma, plot, visualize)
             if plot | visualize == True:
+                X, fig, ax = lamb_oseen_vortex(x0, Gamma, nu, t, centerX, centerY, sigma, plot, visualize)
                 self.create_graphics_window()
+                self.plot_window.create_plot(fig, ax)
 
         if self.comboBox_flowType.currentIndex() == 4:
             print("Rayleigh Problem")
-            X = rayleigh_problem(x0, Vmax, nu, t, sigma, plot)
-            
+            if plot | visualize == True:
+                X, fig, ax = rayleigh_problem(x0, Vmax, nu, t, sigma, plot)
+                self.create_graphics_window()
+                self.plot_window.create_plot(fig, ax)
+
         if self.comboBox_flowType.currentIndex() == 5:
             print("Stokes Problem")
-            X = stokes_problem(x0, Vmax, omega, nu, t, sigma, plot)
+            if plot | visualize == True:
+                X, fig, ax = stokes_problem(x0, Vmax, omega, nu, t, sigma, plot)
+                self.create_graphics_window()
+                self.plot_window.create_plot(fig, ax)
 
     def create_graphics_window(self):
         # This function creates and shows the graphics window
         self.plot_window = GraphicsWindow()
         self.plot_window.show()
 
-    def save_data(self):
-        print("Data Saved")
-        print(x0)
+    # def save_data(self):
+    #     window_settings = ppp, xdim, ydim
+    #     input_settings = sigma, Vmax, timestep, Gamma, nu, omega, centerX, centerY, t
+    #     plot_settings = random, seed, plot, visualize
+    #     data = x0, X, V
+        
+    #     # Open a file dialog to choose the save location
+    #     file_path, _ = QFileDialog.getSaveFileName(self, 'Save Data', '', 'CSV Files (*.csv)')
+        
+    #     if file_path:
+    #         try:
+    #             with open(file_path, 'w', newline='') as csvfile:
+    #                 writer = csv.writer(csvfile)
+    #                 writer.writerow(data_to_save)  # Write data to CSV file
+    #             print("Data saved successfully to:", file_path)
+    #         except Exception as e:
+    #             print("Error saving data:", str(e))
+
+    # def load_data(self):
+
         
     def clear_data(self):
         print("Data Cleared")
@@ -573,13 +604,12 @@ class GraphicsWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle('Flow Visualization')
         self.setGeometry(300, 300, 600, 500)
-        self.create_plot()
 
-    def create_plot(self):
-        # Create the matplotlib figure and canvas
-        self.figure = Figure()
+    def create_plot(self, fig, ax):
+
+        self.figure = fig
         self.canvas = FigureCanvas(self.figure)
-        
+
         # Create the layout and add the canvas and toolbar
         layout = QVBoxLayout()
         toolbar = NavigationToolbar(self.canvas, self)
@@ -591,19 +621,8 @@ class GraphicsWindow(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
-    #     # Plot data
-    #     self.plot_data()
-    
-    # def plot_data(self):
-    #     ax = self.figure.add_subplot(111)
-    #     t = np.arange(0.0, 2.0, 0.01)
-    #     s = 1 + np.sin(2 * np.pi * t)
-    #     ax.plot(t, s)
-    #     ax.set_title('Sine Wave')
-    #     ax.set_xlabel('Time (s)')
-    #     ax.set_ylabel('Amplitude')
-    #     ax.grid(True)
-    #     self.canvas.draw()
+        # Plot data
+        self.canvas.draw()
 
 def start():
     if not QtWidgets.QApplication.instance():

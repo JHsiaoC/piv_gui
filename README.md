@@ -11,7 +11,7 @@ A project to build a simple GUI that provides visualization of simple flows.
 * [Contact](#contact)
 
 ## General Information
-- 'simple_flow_visualization.py' is the Python file that contains the GUI
+- 'logic.py' is the Python file to run 
 - 'input.ui' is the UI file created with Qt Designer
 - 'gui_generator.py' is a Python file that is run to convert 'input.ui' into a Python file
 - 'output.py' is the Python file that was converted from the UI file
