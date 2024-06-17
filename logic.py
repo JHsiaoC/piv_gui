@@ -224,6 +224,8 @@ def lamb_oseen_vortex(x0, Gamma, nu, t, centerX = 256/2, centerY = 256/2, sigma 
         ax.set_xlabel('Radius from Vortex Center [px]')
         ax.set_ylabel('Particle Velocity [px/s]')
         
+        return fig, ax
+        
     else:
         def lamb_oseen_ODE(t,x0):
             x = x0[:,0].reshape(-1,1)-centerX_vec
@@ -454,8 +456,11 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
             self.lineEdit_centerX.setDisabled(True)
             self.lineEdit_centerY.setDisabled(True)
             
-            self.checkBox_visualize.setDisabled(False)
-            self.label_OR.setDisabled(False)
+            self.checkBox_visualize.setDisabled(True)
+            self.label_OR.setDisabled(True)
+            
+            self.checkBox_visualize.setChecked(False)
+            self.checkBox_plot.setChecked(True)
         
         if self.comboBox_flowType.currentIndex() == 5:
             self.lineEdit_Gamma.setDisabled(True)
@@ -464,19 +469,22 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
             self.lineEdit_centerX.setDisabled(True)
             self.lineEdit_centerY.setDisabled(True)
             
-            self.checkBox_visualize.setDisabled(False)
-            self.label_OR.setDisabled(False)
+            self.checkBox_visualize.setDisabled(True)
+            self.label_OR.setDisabled(True)
+            
+            self.checkBox_visualize.setChecked(False)
+            self.checkBox_plot.setChecked(True)
 
     def generate_field(self):
-        
-        self.pushButton_save.setEnabled(True)
 
         # make values global for saving
         global ppp, xdim, ydim, sigma
         global Vmax, timestep, Gamma, nu, omega, centerX, centerY, t
         global random, seed, plot, visualize
         global x0, X, V
-        
+        X = None
+        V = None
+
         # update values
         ppp = float(self.lineEdit_ppp.text())
         xdim = float(self.lineEdit_xdim.text())
@@ -501,6 +509,10 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         
         x0 = pytgen(ppp, xdim, ydim, random, seed)
         
+        # Set save button to enabled if field was generated
+        if plot == True:
+            self.pushButton_save.setEnabled(True)
+
         # Generate flows        
         if self.comboBox_flowType.currentIndex() == 0:
             print("Uniform")
@@ -525,8 +537,13 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if self.comboBox_flowType.currentIndex() == 3:
             print("Lamb-Oseen")
-            if plot | visualize == True:
+            if plot == True:
                 X, fig, ax = lamb_oseen_vortex(x0, Gamma, nu, t, centerX, centerY, sigma, plot, visualize)
+                self.create_graphics_window()
+                self.plot_window.create_plot(fig, ax)
+            
+            if visualize == True:
+                fig, ax = lamb_oseen_vortex(x0, Gamma, nu, t, centerX, centerY, sigma, plot, visualize)
                 self.create_graphics_window()
                 self.plot_window.create_plot(fig, ax)
 
@@ -555,8 +572,12 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         input_settings = [sigma, Vmax, timestep, Gamma, nu, omega, centerX, centerY, t]
         plot_settings = [random, seed, plot, visualize]
 
-        data_to_save = [window_settings, input_settings, plot_settings]
-        data_to_save += [x0.flatten().tolist(), X.flatten().tolist(), V.flatten().tolist()]
+        # Prepare the lists for x0, X, and V, handling potential absence
+        data_x0 = x0.flatten().tolist() if x0 is not None else []
+        data_X = X.flatten().tolist() if X is not None else []
+        data_V = V.flatten().tolist() if V is not None else []
+
+        data_to_save = [window_settings, input_settings, plot_settings, data_x0, data_X, data_V]
 
         # Open a file dialog to choose the save location
         file_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Data', '', 'CSV Files (*.csv)')
