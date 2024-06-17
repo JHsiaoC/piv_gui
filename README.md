@@ -24,7 +24,7 @@ Qt Designer is used to quickly iterate any visible parts of the design. The actu
 
 Install these packages for running QtDesigner to develop the front-end and to enable the back-end.
 
-`conda install -c anaconda spyder=5.4.3 pyqt`
+`conda install -c anaconda pyqt`
 
 `conda install -c conda-forge matplotlib torchdiffeq`
 

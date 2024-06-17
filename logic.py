@@ -35,16 +35,23 @@ import torch
 from torchdiffeq import odeint
 import matplotlib.pyplot as plt
 import sys
+import csv
 
 #%% particle generation
 def pytgen(ppp, xdim = 256, ydim = 256, random = True, seed = 'foo'):
     number_pixels = int(xdim*ydim)  #counts number of pixels in the frame
     particles = int(number_pixels*ppp)  #counts number of particles that should be present
     if random == True:
-        x0 = xdim*torch.rand((particles,2),dtype=(torch.float32)) # make the "initial" data
+        x0 = torch.cat([
+            xdim * torch.rand((particles, 1), dtype=torch.float32), 
+            ydim * torch.rand((particles, 1), dtype=torch.float32)
+        ], dim=1)  # Combine along the second axis
     if random == False:
         torch.manual_seed(seed)
-        x0 = xdim*torch.rand((particles,2),dtype=(torch.float32)) # make the data with seeded value
+        x0 = torch.cat([
+            xdim * torch.rand((particles, 1), dtype=torch.float32), 
+            ydim * torch.rand((particles, 1), dtype=torch.float32)
+        ], dim=1)  # Combine along the second axis
     return x0
 
 #%% flow functions
@@ -360,6 +367,7 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, *args, **kwargs):
         QtWidgets.QMainWindow.__init__(self, *args, **kwargs)
         self.setupUi(self)
+        self.pushButton_save.setEnabled(False)
     
     def setupUi(self, MainWindow):
         super().setupUi(MainWindow)
@@ -403,6 +411,7 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         # connect pushButtons
         self.pushButton_generate.clicked.connect(self.generate_field)            
         self.pushButton_save.clicked.connect(self.save_data)
+        self.pushButton_load.clicked.connect(self.load_data)
         self.pushButton_clear.clicked.connect(self.clear_data)
         
         # # connect checkBoxes
@@ -460,6 +469,8 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def generate_field(self):
         
+        self.pushButton_save.setEnabled(True)
+
         # make values global for saving
         global ppp, xdim, ydim, sigma
         global Vmax, timestep, Gamma, nu, omega, centerX, centerY, t
@@ -538,28 +549,100 @@ class Logic(QtWidgets.QMainWindow, Ui_MainWindow):
         self.plot_window = GraphicsWindow()
         self.plot_window.show()
 
-    # def save_data(self):
-    #     window_settings = ppp, xdim, ydim
-    #     input_settings = sigma, Vmax, timestep, Gamma, nu, omega, centerX, centerY, t
-    #     plot_settings = random, seed, plot, visualize
-    #     data = x0, X, V
-        
-    #     # Open a file dialog to choose the save location
-    #     file_path, _ = QFileDialog.getSaveFileName(self, 'Save Data', '', 'CSV Files (*.csv)')
-        
-    #     if file_path:
-    #         try:
-    #             with open(file_path, 'w', newline='') as csvfile:
-    #                 writer = csv.writer(csvfile)
-    #                 writer.writerow(data_to_save)  # Write data to CSV file
-    #             print("Data saved successfully to:", file_path)
-    #         except Exception as e:
-    #             print("Error saving data:", str(e))
+    def save_data(self):
+        # Consolidate all data into one list for writing to CSV
+        window_settings = [ppp, xdim, ydim]
+        input_settings = [sigma, Vmax, timestep, Gamma, nu, omega, centerX, centerY, t]
+        plot_settings = [random, seed, plot, visualize]
 
-    # def load_data(self):
+        data_to_save = [window_settings, input_settings, plot_settings]
+        data_to_save += [x0.flatten().tolist(), X.flatten().tolist(), V.flatten().tolist()]
 
+        # Open a file dialog to choose the save location
+        file_path, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save Data', '', 'CSV Files (*.csv)')
+        
+        if file_path:
+            try:
+                with open(file_path, 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile)
+                    for row in data_to_save:
+                        writer.writerow(row)  # Write each row of data to the CSV file
+                print("Data saved successfully to:", file_path)
+            except Exception as e:
+                print("Error saving data:", str(e))
+
+    def load_data(self):
+        file_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Load Data', '', 'CSV Files (*.csv)')
+        if file_path:
+            try:
+                with open(file_path, 'r', newline='') as csvfile:
+                    reader = csv.reader(csvfile)
+                    all_data = list(reader)  # Convert all rows into a list
+
+                    # Assuming data is stored in the same order it was saved
+                    window_settings = list(map(float, all_data[0]))
+                    input_settings = list(map(float, all_data[1]))
+                    plot_settings = list(map(eval, all_data[2]))  # Convert 'True'/'False' strings
+                    data_x0 = list(map(float, all_data[3]))
+                    data_X = list(map(float, all_data[4]))
+                    data_V = list(map(float, all_data[5]))
+
+                    # Update GUI elements
+                    self.lineEdit_ppp.setText(str(window_settings[0]))
+                    self.lineEdit_xdim.setText(str(window_settings[1]))
+                    self.lineEdit_ydim.setText(str(window_settings[2]))
+                    self.lineEdit_sigma.setText(str(input_settings[0]))
+                    self.lineEdit_Vmax.setText(str(input_settings[1]))
+                    self.lineEdit_timestep.setText(str(input_settings[2]))
+                    self.lineEdit_Gamma.setText(str(input_settings[3]))
+                    self.lineEdit_nu.setText(str(input_settings[4]))
+                    self.lineEdit_omega.setText(str(input_settings[5]))
+                    self.lineEdit_centerX.setText(str(input_settings[6]))
+                    self.lineEdit_centerY.setText(str(input_settings[7]))
+
+                    self.checkBox_randomSeed.setChecked(plot_settings[0])
+                    self.lineEdit_seed.setText(str(plot_settings[1]))
+                    self.checkBox_plot.setChecked(plot_settings[2])
+                    self.checkBox_visualize.setChecked(plot_settings[3])
+
+                    # Assuming data_x0, data_X, and data_V are flattened lists
+                    # Reshape and assign to class variables or update further GUI/components if necessary
+                    self.data_x0 = torch.tensor(data_x0).view(2, -1)
+                    self.data_X = torch.tensor(data_X).view(2, -1)
+                    self.data_V = torch.tensor(data_V).view(2, -1)
+
+                    print("Data loaded successfully from:", file_path)
+            except Exception as e:
+                print("Error loading data:", str(e))
         
     def clear_data(self):
+        # Reset QLineEdit widgets to default or empty strings
+        self.lineEdit_ppp.clear()
+        self.lineEdit_xdim.clear()
+        self.lineEdit_ydim.clear()
+        self.lineEdit_sigma.clear()
+        self.lineEdit_Vmax.clear()
+        self.lineEdit_timestep.clear()
+        self.lineEdit_Gamma.clear()
+        self.lineEdit_nu.clear()
+        self.lineEdit_omega.clear()
+        self.lineEdit_centerX.clear()
+        self.lineEdit_centerY.clear()
+        self.lineEdit_seed.clear()  # Assuming you want to clear the seed too
+
+        # Reset QCheckBox widgets to unchecked
+        self.checkBox_randomSeed.setChecked(False)
+        self.checkBox_plot.setChecked(False)
+        self.checkBox_visualize.setChecked(False)
+
+        # Reset internal data tensors or variables if applicable
+        self.data_x0 = None
+        self.data_X = None
+        self.data_V = None
+
+        # Optionally, disable buttons or indicators that should not be active until new data is generated
+        self.pushButton_save.setEnabled(False)
+
         print("Data Cleared")
     
     def random_seed(self):
